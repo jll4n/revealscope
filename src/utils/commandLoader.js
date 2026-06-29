@@ -3,12 +3,12 @@ import path from "path";
 import { pathToFileURL } from "url";
 
 export async function loadCommands(commandsPath) {
-  const commands = new Map();
+  const commands = [];
 
-  for (const file of fs.readdirSync(commandsPath).filter((file) => file.endsWith(".js"))) {
-    const command = await import(pathToFileURL(path.join(commandsPath, file)).href);
-    if (command.default && command.default.name) {
-      commands.set(command.default.name, command.default);
+  for (const file of fs.readdirSync(commandsPath).filter((f) => f.endsWith(".js"))) {
+    const mod = await import(pathToFileURL(path.join(commandsPath, file)).href);
+    if (mod.default?.data?.name) {
+      commands.push([mod.default.data.name, mod.default]);
     }
   }
 

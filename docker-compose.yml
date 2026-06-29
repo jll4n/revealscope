@@ -24,11 +24,12 @@ services:
         condition: service_healthy
     environment:
       DISCORD_TOKEN: ${DISCORD_TOKEN}
+      DISCORD_CLIENT_ID: ${DISCORD_CLIENT_ID}
+      DISCORD_GUILD_ID: ${DISCORD_GUILD_ID}
       DB_HOST: mysql
       DB_USER: root
       DB_PASSWORD: antoine
       DB_NAME: revealscope
-      PREFIX: !
     volumes:
       - .:/usr/src/app
     command: npm run dev
