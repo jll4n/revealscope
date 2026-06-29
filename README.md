@@ -18,7 +18,7 @@ Base de projet pour un bot Discord Node.js avec stockage centralisé des notes d
 
 1. Copier `.env.example` en `.env`
 2. Remplir `DISCORD_TOKEN`, `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`
-3. Lancer `npm install`
+3. Lancer `npm install` et `npm start`
 4. Utiliser `docker compose up -d`
 
 ## Utilisation
@@ -51,6 +51,21 @@ Les membres peuvent répondre au questionnaire et donner une note globale :
 
 - `!stats` : affiche la note moyenne du serveur et le top 5 des utilisateurs
 - `!stats @utilisateur` : affiche la note moyenne du membre
+
+### Intents Discord
+
+Le bot utilise un intent `Message Content` pour lire les commandes préfixées. Si ce n’est pas activé dans le Discord Developer Portal, le bot peut toujours démarrer mais ne verra pas le contenu des messages.
+
+- active `Message Content Intent` dans l’onglet `Bot` de ton application Discord
+- ou définis `ENABLE_MESSAGE_CONTENT_INTENT=false` si tu veux démarrer sans cette permission
+
+## Interface de base de données
+
+Un accès phpMyAdmin est disponible sur `http://localhost:8080` une fois que Docker est démarré.
+
+- utilisateur : `root`
+- mot de passe : `antoine`
+- hôte : `mysql`
 
 ## CI/CD
 
