@@ -7,7 +7,7 @@ Bot Discord permettant aux gérants d'un serveur de lancer des sessions de vote 
 - **Runtime** : Node.js 20, ESModules (`"type": "module"`)
 - **Bot** : discord.js v14 (slash commands uniquement, pas de prefix)
 - **BDD** : MySQL 8 via mysql2/promise, conteneurisé avec Docker
-- **CI/CD** : GitHub Actions (lint sur push/PR vers `main`)
+- **CI/CD** : GitHub Actions (lint, vérification syntaxique et tests sur push/PR vers `main`)
 - **Package manager** : npm
 
 ## Architecture
@@ -21,16 +21,21 @@ src/
   handlers/
     vote.js             # Gestion bouton "Voter" + soumission modal
   database/
-    mysql.js            # Pool de connexions, fonctions connectDatabase() / getPool()
+    mysql.js            # Pool de connexions, fonctions connectDatabase() / getPool() / setPool() (tests)
   events/
     ready.js            # Événement ready
     interactionCreate.js # Routage slash commands, boutons et modals
   utils/
     commandLoader.js    # Chargement dynamique des fichiers de commands/
+test/
+  helpers/
+    mockInteraction.js  # Mock d'interaction Discord.js + mock de pool MySQL pour les tests
+  commands/              # Tests des slash commands (session.js, stats.js)
+  handlers/               # Tests des handlers de boutons/modals (vote.js)
 db/
   init.sql              # Schéma initial (rating_sessions + ratings)
 .github/workflows/
-  ci.yml                # Lint ESLint sur Node 20
+  ci.yml                # Lint ESLint, vérification syntaxique et tests (node --test) sur Node 20
 Dockerfile
 docker-compose.yml
 .env.example
@@ -101,6 +106,8 @@ npm start
 ## CI/CD
 
 - **Lint** : `npm run lint` (ESLint) déclenché sur chaque push/PR vers `main`
+- **Syntax check** : `node --check` sur tous les fichiers de `src/`
+- **Tests** : `npm test` (`node --test test/`) — appelle directement `execute()` des commandes/handlers avec une interaction et un pool MySQL mockés (voir `test/helpers/mockInteraction.js`), pour vérifier qu'aucune commande ne lève d'exception non gérée. Pas de connexion réelle à Discord ni à MySQL.
 - Les secrets GitHub nécessaires : `DISCORD_TOKEN`, `DISCORD_CLIENT_ID`, `DISCORD_GUILD_ID`, `DB_*`
 - Le déploiement VPS n'est pas encore automatisé — prévu en phase finale
 
@@ -113,9 +120,9 @@ npm start
 - Toujours utiliser `pool.execute()` (paramètres préparés), jamais d'interpolation directe dans les requêtes SQL
 - Ajouter une nouvelle commande = créer un fichier dans `src/commands/` et exporter `{ data, execute }` — le loader est automatique
 - Les handlers de boutons/modals vont dans `src/handlers/`, pas dans `src/commands/`
+- Ajouter une nouvelle commande/handler testable = écrire son test dans `test/commands/` ou `test/handlers/` en s'appuyant sur `createMockInteraction()` / `createMockPool()` de `test/helpers/mockInteraction.js`, et `setPool()` de `src/database/mysql.js` pour injecter le mock
 
 ## Ce qui reste à faire / axes d'évolution
 
 - Automatiser le déploiement VPS dans le workflow GitHub Actions (SSH + Docker pull)
-- Ajouter des tests d'intégration dans la CI
 - Afficher les résultats détaillés par question dans `/stats`

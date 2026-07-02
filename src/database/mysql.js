@@ -23,3 +23,8 @@ export function getPool() {
   }
   return pool;
 }
+
+// Utilisé uniquement par les tests pour injecter un pool mocké.
+export function setPool(mockPool) {
+  pool = mockPool;
+}
