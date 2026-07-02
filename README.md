@@ -1,6 +1,6 @@
 # RevealScope Discord Rating Bot
 
-Bot Discord permettant aux gérants d'un serveur de lancer des sessions de vote sur un produit/service via un questionnaire interactif (boutons + modal), centralisé dans une base MySQL.
+Recueillez l'avis de votre communauté Discord sur un produit ou service : une session de vote guidée (boutons + modal), des résultats agrégés par question, historisés en base MySQL et centralisés.
 
 ## Structure
 
