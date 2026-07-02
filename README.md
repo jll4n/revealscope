@@ -19,7 +19,7 @@ Recueillez l'avis de votre communauté Discord sur un produit ou service : une s
 ## Installation
 
 1. Copier `.env.example` en `.env`
-2. Remplir `DISCORD_TOKEN`, `DISCORD_CLIENT_ID`, `DISCORD_GUILD_ID`, `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`
+2. Remplir `DISCORD_TOKEN`, `DISCORD_CLIENT_ID`, `DISCORD_GUILD_ID`, `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`, et éventuellement `ALLOWED_USER_IDS`
 3. Lancer `docker compose up -d mysql` pour démarrer la base
 4. Lancer `npm install` puis `npm start` (ou `npm run dev` avec nodemon)
 
@@ -31,7 +31,7 @@ Toutes les commandes sont des **slash commands** Discord (pas de préfixe).
 
 ### Lancer une session de vote
 
-Réservé aux membres avec la permission `Gérer le serveur` :
+Réservé aux membres avec la permission `Gérer le serveur` **et** dont l'ID Discord figure dans `ALLOWED_USER_IDS` (`.env`) — si cette variable est vide, seule la permission Discord s'applique :
 
 ```
 /session start produit:iPhone 15 questions:Note le design|Note la rapidité

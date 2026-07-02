@@ -4,6 +4,38 @@ import { setPool } from "../../src/database/mysql.js";
 import sessionCommand from "../../src/commands/session.js";
 import { createMockInteraction, createMockPool } from "../helpers/mockInteraction.js";
 
+test.afterEach(() => {
+  delete process.env.ALLOWED_USER_IDS;
+});
+
+test("/session refuse un utilisateur non listé dans ALLOWED_USER_IDS", async () => {
+  process.env.ALLOWED_USER_IDS = "user-allowed";
+  setPool(createMockPool());
+
+  const interaction = createMockInteraction({
+    user: { id: "user-not-allowed" },
+    options: { getSubcommand: () => "stop" },
+  });
+
+  await assert.doesNotReject(() => sessionCommand.execute(interaction));
+  assert.match(interaction.lastReply.content, /pas autorisé/);
+});
+
+test("/session autorise un utilisateur listé dans ALLOWED_USER_IDS", async () => {
+  process.env.ALLOWED_USER_IDS = "user-allowed, user-1";
+  setPool(createMockPool([
+    [{ affectedRows: 1 }, []],
+  ]));
+
+  const interaction = createMockInteraction({
+    user: { id: "user-1" },
+    options: { getSubcommand: () => "stop" },
+  });
+
+  await assert.doesNotReject(() => sessionCommand.execute(interaction));
+  assert.equal(interaction.lastReply, "Session de vote clôturée.");
+});
+
 test("/session start crée une session et répond sans planter", async () => {
   setPool(createMockPool([
     [[], []], // SELECT existing -> aucune session active

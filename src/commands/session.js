@@ -25,6 +25,18 @@ export default {
     ),
 
   async execute(interaction) {
+    const allowedUserIds = (process.env.ALLOWED_USER_IDS || "")
+      .split(",")
+      .map((id) => id.trim())
+      .filter(Boolean);
+
+    if (allowedUserIds.length > 0 && !allowedUserIds.includes(interaction.user.id)) {
+      return interaction.reply({
+        content: "Vous n'êtes pas autorisé à utiliser cette commande.",
+        flags: MessageFlags.Ephemeral
+      });
+    }
+
     const pool = getPool();
     const guildId = interaction.guild.id;
     const sub = interaction.options.getSubcommand();

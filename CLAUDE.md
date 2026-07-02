@@ -52,6 +52,7 @@ docker-compose.yml
 | `DB_USER` | Utilisateur MySQL |
 | `DB_PASSWORD` | Mot de passe MySQL |
 | `DB_NAME` | Nom de la base (`revealscope`) |
+| `ALLOWED_USER_IDS` | IDs Discord (snowflakes) séparés par des virgules, autorisés à utiliser `/session start\|stop`. Si vide/absent, aucune restriction supplémentaire (seule la permission Discord `ManageGuild` s'applique) |
 
 ## Schéma BDD
 
@@ -78,8 +79,8 @@ docker-compose.yml
 
 | Commande | Permission | Description |
 |---|---|---|
-| `/session start produit:X questions:Q1\|Q2` | ManageGuild | Lance une session de vote (max 4 questions) |
-| `/session stop` | ManageGuild | Clôture la session active |
+| `/session start produit:X questions:Q1\|Q2` | ManageGuild + `ALLOWED_USER_IDS` | Lance une session de vote (max 4 questions) |
+| `/session stop` | ManageGuild + `ALLOWED_USER_IDS` | Clôture la session active |
 | `/stats` | Tous | Moyenne globale + top 5 du serveur |
 | `/stats utilisateur:@user` | Tous | Moyenne et nombre de notes d'un utilisateur |
 
@@ -119,6 +120,7 @@ npm start
 - Toujours utiliser `interaction.reply({ ephemeral: true })` pour les messages d'erreur utilisateur
 - Toujours utiliser `pool.execute()` (paramètres préparés), jamais d'interpolation directe dans les requêtes SQL
 - Ajouter une nouvelle commande = créer un fichier dans `src/commands/` et exporter `{ data, execute }` — le loader est automatique
+- `/session start|stop` sont doublement protégées : permission Discord `ManageGuild` (visibilité de la commande) + whitelist explicite `ALLOWED_USER_IDS` vérifiée en début d'`execute()`
 - Les handlers de boutons/modals vont dans `src/handlers/`, pas dans `src/commands/`
 - Ajouter une nouvelle commande/handler testable = écrire son test dans `test/commands/` ou `test/handlers/` en s'appuyant sur `createMockInteraction()` / `createMockPool()` de `test/helpers/mockInteraction.js`, et `setPool()` de `src/database/mysql.js` pour injecter le mock
 
